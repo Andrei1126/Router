@@ -1,0 +1,46 @@
+Micut Andrei-Ion
+Grupa 321CB
+
+												~Router~
+
+	In tema asta pot sa zic ca am inteles cum functioneaza si care este rolul unui router.
+
+	Spre exemplu, daca un host h0 vrea sa comunice cu un alt host h1 (sa dea ping), atunci mai intai h0 trimite un ARP request catre interfata cu care e conectat la router pentru a afla MAC-ul acesteia. Apoi se trimite efectiv pachetul ICMP.
+	
+	Acesta este momentul cand router-ul vrea sa afle adresa MAC a destinatiei din pachet si trimite un ARP request catre interfata corespunzatoare cu adresa de broadcast pentru a primi inapoi un ARP reply cu adresa MAC a destinatiei pachetului. 
+	
+	Dupa ce isi stocheaza adresa in tabela ARP forwardeaza pachetul catre destinatie.
+
+	Pentru a face cautarea in tabela de rutare am sortat tabela crescator dupa prefix, iar daca prefixele erau egale o sortam descrescator dupa masca acestora. Pentru a gasi un match mai rapid.
+	
+	Cu ajutorul functiei init_routing_table, imi aloc spatiu pantru tabela de rutare.
+	
+	In functia read_routing_table voi initializa fiecare camp din tabela de rutare cu ce se afla in fisier.
+
+	Functia arp_table imi va initializa tabela ARP.
+	
+	Tabela ARP se updateaza la fiecare request si reply de ARP, acest lucru fiind realizat cu ajutorul functiei arptable_push.
+
+	Functia craft_arp_request imi va initializa header-ul ARP.
+
+	Apoi realizez intializarea pachetului prin introducerea datelor ce vor fi transmise in payload. (functia init_pachet)
+
+	Functia ip_checksum imi va calcula checksum-ul ip-ului.
+	
+	Arp:
+	
+	-> Request: H1 vrea sa dea ping la H2
+
+	-> Extrag ETHER Header-ul si ARP Header-ul
+	
+	-> Functia get_arp_entry verifica ip-ul pentru a vedea unde trebuie sa ajungem (in reteaua care trebuie)
+	
+	IP:
+	
+	-> Daca noul checksum este diferit de cel vechi, atunci ii dau drop pachetului. (checksum-ul ip-ului va retine header-ul sau)
+
+	-> Daca ttl <= 1, atunci ii dau drop pachetului. (ICMP TIME EXCEEDED)
+
+	-> Extrag BEST ROUT - Caut in tabela de rutare. Realizez acest lucru cu ajutorul cautarii binare (O (logn))
+
+	
